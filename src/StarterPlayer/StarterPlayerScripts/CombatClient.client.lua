@@ -288,6 +288,7 @@ UserInputService.InputEnded:Connect(function(input)
 end)
 
 createUI()
+print("[BreathingBlades] Combat client online")
 task.spawn(function()
 	while ui.gui and ui.gui.Parent do
 		refreshAbilityUI()

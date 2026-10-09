@@ -308,6 +308,7 @@ Players.PlayerRemoving:Connect(function(player)
 end)
 
 createArena()
+print("[BreathingBlades] Combat server online")
 
 task.spawn(function()
 	while true do
