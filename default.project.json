@@ -3,13 +3,31 @@
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
-      "$path": "src/ReplicatedStorage"
+      "$className": "ReplicatedStorage",
+      "CombatConfig": {
+        "$path": "src/ReplicatedStorage/CombatConfig.lua"
+      },
+      "Shared": {
+        "$path": "src/ReplicatedStorage/Shared"
+      }
     },
     "ServerScriptService": {
-      "$path": "src/ServerScriptService"
+      "$className": "ServerScriptService",
+      "CombatServer": {
+        "$path": "src/ServerScriptService/CombatServer.server.lua"
+      }
     },
     "StarterPlayer": {
-      "$path": "src/StarterPlayer"
+      "$className": "StarterPlayer",
+      "StarterPlayerScripts": {
+        "$className": "StarterPlayerScripts",
+        "CombatClient": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/CombatClient.client.lua"
+        },
+        "MovementController": {
+          "$path": "src/StarterPlayer/StarterPlayerScripts/MovementController.client.lua"
+        }
+      }
     }
   }
 }
