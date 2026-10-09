@@ -2,6 +2,12 @@
 
 An original Roblox PvP arena prototype inspired by high-energy sword anime combat. The project is intentionally asset-free: the arena, combat feedback, energy trails, impact bursts, lightning, rings, and HUD are generated at runtime with Roblox Parts, Beams-style geometry, particles, lights, and tweens.
 
+## Current development direction
+
+The first combat prototype was intentionally superseded by a pre-production plan. Read [`GAME_DESIGN_BIBLE.md`](GAME_DESIGN_BIBLE.md) before adding new styles or abilities. It defines the custom movement/physics mandate, lore-informed style identities, BDA rules, animation pipeline, balance budgets, test gates, and implementation phases.
+
+The new movement foundation disables default Humanoid locomotion and uses custom camera-relative acceleration, jump/gravity/fall/landing states, blockcast collision sweeps, authored dash motion, and procedural placeholder poses. It is the beginning of the movement sandbox and is not yet the finished combat controller.
+
 ## What is included
 
 - Server-authoritative melee combat with a 4-hit combo, recovery windows, heavy block-breaker, knockback, and stun feedback.

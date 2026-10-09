@@ -9,6 +9,30 @@ remote.Parent = ReplicatedStorage
 
 local states = {}
 
+local function configureCharacter(character)
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+	humanoid.WalkSpeed = 0
+	humanoid.JumpPower = 0
+	humanoid.AutoRotate = false
+	humanoid.UseJumpPower = true
+	for _, stateType in ipairs({
+		Enum.HumanoidStateType.Running,
+		Enum.HumanoidStateType.RunningNoPhysics,
+		Enum.HumanoidStateType.Jumping,
+		Enum.HumanoidStateType.Freefall,
+		Enum.HumanoidStateType.Landed,
+		Enum.HumanoidStateType.Climbing,
+		Enum.HumanoidStateType.Swimming,
+		Enum.HumanoidStateType.GettingUp,
+	}) do
+		humanoid:SetStateEnabled(stateType, false)
+	end
+	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+	local animate = character:FindFirstChild("Animate")
+	if animate then animate.Disabled = true end
+end
+
 local function makePart(parent, name, size, cframe, color, material, transparency)
 	local part = Instance.new("Part")
 	part.Name = name
@@ -143,7 +167,14 @@ local function damageTarget(attacker, targetHumanoid, amount, force, sourcePosit
 	if force > 0 and not blocked then
 		local direction = (targetRoot.Position - sourcePosition)
 		if direction.Magnitude < 0.1 then direction = Vector3.new(0, 0, -1) end
-		targetRoot.AssemblyLinearVelocity = direction.Unit * force + Vector3.new(0, math.min(force * 0.28, 28), 0)
+		if targetPlayer then
+			remote:FireClient(targetPlayer, "Knockback", {
+				direction = direction.Unit,
+				force = force,
+				duration = guardBreak and 0.24 or 0.16,
+				lift = math.min(force * 0.28, 28),
+			})
+		end
 		setStunned(targetPlayer, guardBreak and Config.BlockBreakStun or Config.StunTime)
 	end
 
@@ -208,7 +239,7 @@ local function doDash(player)
 	if os.clock() - (state.lastDash or 0) < 1.15 then return end
 	state.lastDash = os.clock()
 	local _, _, root = getCharacterParts(player)
-	root.AssemblyLinearVelocity = root.CFrame.LookVector * 78 + Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
+	remote:FireClient(player, "DashApproved", {direction = root.CFrame.LookVector})
 	remote:FireAllClients("Dash", {player = player, origin = root.Position, forward = root.CFrame.LookVector, style = state.style})
 end
 
@@ -233,7 +264,7 @@ local function doAbility(player, key)
 	remote:FireAllClients("Ability", {player = player, origin = root.Position, forward = forward, style = state.style, key = key, kind = ability.Kind})
 
 	if key == "E" then
-		root.AssemblyLinearVelocity = forward * math.min(ability.Range * 3.2, 75) + Vector3.new(0, root.AssemblyLinearVelocity.Y, 0)
+		remote:FireClient(player, "MotionApproved", {kind = "Lunge", direction = forward})
 	end
 
 	task.delay(0.16, function()
@@ -296,6 +327,7 @@ Players.PlayerAdded:Connect(function(player)
 		state.combo = 0
 		state.breath = Config.MaxBreath
 		state.breathing = false
+		configureCharacter(character)
 		character:SetAttribute("Style", state.style)
 		character:SetAttribute("Blocking", false)
 		character:SetAttribute("Breathing", false)
