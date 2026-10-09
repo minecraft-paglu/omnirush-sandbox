@@ -9,6 +9,27 @@ remote.Parent = ReplicatedStorage
 
 local states = {}
 
+local function restoreDefaultMovement(character)
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+	humanoid.WalkSpeed = 16
+	humanoid.JumpPower = 50
+	humanoid.AutoRotate = true
+	for _, stateType in ipairs({
+		Enum.HumanoidStateType.Running,
+		Enum.HumanoidStateType.RunningNoPhysics,
+		Enum.HumanoidStateType.Jumping,
+		Enum.HumanoidStateType.Freefall,
+		Enum.HumanoidStateType.Landed,
+		Enum.HumanoidStateType.Climbing,
+		Enum.HumanoidStateType.Swimming,
+		Enum.HumanoidStateType.GettingUp,
+	}) do
+		humanoid:SetStateEnabled(stateType, true)
+	end
+	print("[BreathingBlades][Server] Default movement restored for", character.Name)
+end
+
 local function configureCharacter(character)
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
 	if not humanoid then return end
@@ -31,6 +52,7 @@ local function configureCharacter(character)
 	humanoid:ChangeState(Enum.HumanoidStateType.Physics)
 	local animate = character:FindFirstChild("Animate")
 	if animate then animate.Disabled = true end
+	print("[BreathingBlades][Server] Custom movement enabled for", character.Name)
 end
 
 local function makePart(parent, name, size, cframe, color, material, transparency)
@@ -308,6 +330,10 @@ remote.OnServerEvent:Connect(function(player, action, value)
 		setBlocking(player, value == true)
 	elseif action == "Breath" then
 		setBreathing(player, value == true)
+	elseif action == "MovementReady" then
+		if player.Character then configureCharacter(player.Character) end
+	elseif action == "MovementFailed" then
+		if player.Character then restoreDefaultMovement(player.Character) end
 	elseif action == "Style" and Config.Styles[value] then
 		state.style = value
 		state.cooldowns = {}
@@ -327,7 +353,7 @@ Players.PlayerAdded:Connect(function(player)
 		state.combo = 0
 		state.breath = Config.MaxBreath
 		state.breathing = false
-		configureCharacter(character)
+		restoreDefaultMovement(character)
 		character:SetAttribute("Style", state.style)
 		character:SetAttribute("Blocking", false)
 		character:SetAttribute("Breathing", false)

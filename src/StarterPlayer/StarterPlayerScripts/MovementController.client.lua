@@ -24,6 +24,16 @@ local dash = nil
 local dashRecovery = 0
 local externalMotion = nil
 local animationClock = 0
+local controllerFailed = false
+local lastDebugLog = 0
+
+local function debugLog(message, ...)
+	print("[BreathingBlades][ClientMovement] " .. message, ...)
+end
+
+local function debugWarn(message, ...)
+	warn("[BreathingBlades][ClientMovement] " .. message, ...)
+end
 
 local function flat(vector)
 	return Vector3.new(vector.X, 0, vector.Z)
@@ -34,6 +44,7 @@ local function unitOr(vector, fallback)
 end
 
 local function setDefaultMovementStates(currentHumanoid)
+	debugLog("Disabling default movement states for", character.Name)
 	currentHumanoid.WalkSpeed = 0
 	currentHumanoid.JumpPower = 0
 	currentHumanoid.AutoRotate = false
@@ -54,6 +65,7 @@ local function setDefaultMovementStates(currentHumanoid)
 
 	local animate = character and character:FindFirstChild("Animate")
 	if animate then animate.Disabled = true end
+	debugLog("Default movement states disabled")
 end
 
 local function collectMotors()
@@ -281,6 +293,7 @@ end
 
 local function bindCharacter(newCharacter)
 	character = newCharacter
+	debugLog("Character bound", character:GetFullName())
 	humanoid = character:WaitForChild("Humanoid")
 	root = character:WaitForChild("HumanoidRootPart")
 	velocity = Vector3.zero
@@ -290,6 +303,43 @@ local function bindCharacter(newCharacter)
 	state = States.Idle
 	setDefaultMovementStates(humanoid)
 	collectMotors()
+	remote:FireServer("MovementReady")
+	debugLog("Custom movement ready; waiting for frame updates")
+end
+
+local function restoreDefaultMovement()
+	if not humanoid then return end
+	humanoid.WalkSpeed = 16
+	humanoid.JumpPower = 50
+	humanoid.AutoRotate = true
+	for _, stateType in ipairs({
+		Enum.HumanoidStateType.Running,
+		Enum.HumanoidStateType.RunningNoPhysics,
+		Enum.HumanoidStateType.Jumping,
+		Enum.HumanoidStateType.Freefall,
+		Enum.HumanoidStateType.Landed,
+		Enum.HumanoidStateType.Climbing,
+		Enum.HumanoidStateType.Swimming,
+		Enum.HumanoidStateType.GettingUp,
+	}) do
+		humanoid:SetStateEnabled(stateType, true)
+	end
+	local animate = character and character:FindFirstChild("Animate")
+	if animate then animate.Disabled = false end
+	remote:FireServer("MovementFailed")
+	debugWarn("Controller disabled itself and restored default movement")
+end
+
+local function safeUpdate(dt)
+	if controllerFailed then return end
+	local ok, errorMessage = xpcall(function()
+		updateController(dt)
+	end, debug.traceback)
+	if not ok then
+		controllerFailed = true
+		debugWarn("FRAME ERROR: " .. tostring(errorMessage))
+		restoreDefaultMovement()
+	end
 end
 
 UserInputService.InputBegan:Connect(function(input)
@@ -329,7 +379,11 @@ remote.OnClientEvent:Connect(function(action, data)
 	end
 end)
 
-player.CharacterAdded:Connect(bindCharacter)
+debugLog("Script started")
+player.CharacterAdded:Connect(function(newCharacter)
+	controllerFailed = false
+	bindCharacter(newCharacter)
+end)
 if player.Character then bindCharacter(player.Character) end
 
-RunService.RenderStepped:Connect(updateController)
+RunService.RenderStepped:Connect(safeUpdate)
