@@ -258,7 +258,9 @@ remote.OnClientEvent:Connect(function(action, data)
 end)
 
 UserInputService.InputBegan:Connect(function(input, processed)
-	if processed then return end
+	-- Roblox marks some mouse/keyboard events as processed when CoreGui has focus.
+	-- Only suppress combat while the player is actively typing into a text box.
+	if UserInputService:GetFocusedTextBox() then return end
 	if input.UserInputType == Enum.UserInputType.MouseButton1 then
 		remote:FireServer("Attack")
 	elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
