@@ -1,0 +1,14 @@
+# Roblox Studio / Rojo local files
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+.rojo/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+
+# Editor / tooling files
+.vscode/settings.json
+node_modules/
