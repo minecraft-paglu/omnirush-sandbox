@@ -1,84 +1,54 @@
-# Breathing Blades
+# Breathbound: Lanternfall
 
-An original Roblox PvP arena prototype inspired by high-energy sword anime combat. The project is intentionally asset-free: the arena, combat feedback, energy trails, impact bursts, lightning, rings, and HUD are generated at runtime with Roblox Parts, Beams-style geometry, particles, lights, and tweens.
+An original browser-based action duel about disciplined sword forms and demons who weaponize personal obsessions. Lanternfall studies the readable body mechanics, defensive cadence, and cinematic energy of demon-hunting anime and arena fighters while using original names, fiction, geometry, effects, and audio.
 
-## Current development direction
+## Current slice
 
-The first combat prototype was intentionally superseded by a pre-production plan. Read [`GAME_DESIGN_BIBLE.md`](GAME_DESIGN_BIBLE.md) before adding new styles or abilities. It defines the custom movement/physics mandate, lore-informed style identities, BDA rules, animation pipeline, balance budgets, test gates, and implementation phases.
+The repository now contains:
 
-The new movement foundation disables default Humanoid locomotion and uses custom camera-relative acceleration, jump/gravity/fall/landing states, blockcast collision sweeps, authored dash motion, and procedural placeholder poses. It is the beginning of the movement sandbox and is not yet the finished combat controller.
+- A Vite + TypeScript + Three.js browser build.
+- A renderer-independent 60 Hz simulation with render interpolation.
+- Custom movement state ownership: acceleration, deceleration, facing, ground/jump/fall/landing, dash, air control, arena bounds, knockback, and recovery.
+- Universal combat: four-hit ground chain, two-hit air chain, heavy guard breaker, guard durability, perfect guard, throw, dodge, launch, knockdown, and recovery.
+- Two original kits: Riverform and Threadcraft, each with five forms and an ultimate.
+- A local two-player arena, procedural development fighters, event-driven effect feedback, HUD, and F1 debug overlay.
+- Vitest coverage for fixed movement, landing, dash invulnerability, authored attack timelines, deduplicated hits, parry, resource gating, and world reset.
 
-## What is included
-
-- Server-authoritative melee combat with a 4-hit combo, recovery windows, heavy block-breaker, knockback, and stun feedback.
-- Guarding with reduced incoming damage and a short perfect-block window that can parry even a breaker.
-- A `G` breathing meter that powers abilities and regenerates while focused.
-- Four selectable original combat paths:
-  - **Tide Breathing** — flowing ranged waves.
-  - **Ember Breathing** — explosive close-range pressure.
-  - **Storm Breathing** — fast lunges and lightning cages.
-  - **Crimson Blood Art** — forbidden bloodcraft with wide area control.
-- Five abilities per path mapped to `E`, `R`, `T`, `Y`, and `X`, including a style-specific `T` block breaker and `X` ultimate.
-- Generated duel arena with cover, walls, and four spawn pads.
-- HUD showing style selection, ability names, cooldowns, and controls.
-
-## Run it in Roblox Studio
-
-This is a **Rojo** project. You need:
-
-1. [Roblox Studio](https://create.roblox.com/)
-2. [Git](https://git-scm.com/downloads)
-3. The [Rojo Studio plugin](https://www.roblox.com/library/13916191980/Rojo)
-4. The [Rojo command-line tool](https://rojo.space/docs/installation/)
-
-After cloning the repository, open PowerShell in its folder and run:
+## Run locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-cd YOUR_REPOSITORY
-rojo serve
+npm install
+npm run dev
 ```
 
-Open Roblox Studio, create a new **Baseplate** place, open the Rojo plugin, connect it to the printed server (normally `localhost:34872`), and sync the project. Press **Play**; the server script generates the arena automatically.
+Open the Vite URL printed in the terminal. Production validation:
 
-For a quick two-player test, use **Test > Start** with two players after syncing. Open the test clients and use the controls below to fight between them.
-
-If you prefer not to use Rojo, create the same instance layout manually:
-
-- `ReplicatedStorage/CombatConfig` as a ModuleScript
-- `ServerScriptService/CombatServer.server.lua` as a Script
-- `StarterPlayer/StarterPlayerScripts/CombatClient.client.lua` as a LocalScript
+```bash
+npm test
+npm run build
+```
 
 ## Controls
 
-| Input | Action |
-| --- | --- |
-| Left mouse | Four-hit light attack combo |
-| Right mouse | Heavy attack / block breaker |
-| `F` | Hold to guard; tap timing creates a perfect block |
-| `Q` | Dash forward |
-| `E` / `R` / `T` / `Y` / `X` | Style forms 1 - 5 |
-| `G` | Toggle focused breathing to refill the breath meter |
-| `1` - `4` | Select Tide, Ember, Storm, or Crimson |
+| Player | Movement | Combat |
+|---|---|---|
+| P1 | WASD | J light, K heavy, L guard, Space jump, Shift dash, I throw, E/R/T/Y/X forms, U ultimate |
+| P2 | Arrow keys | Numpad 1 light, 2 heavy, 3 guard, 0 jump, Enter dash, Decimal throw, Numpad 4–8 forms, 9 ultimate |
 
-## Combat rules
+`F1` toggles the simulation debugger. `F2` resets the match.
 
-The interaction model follows the publicly documented DSRPG2-style loop: light attacks confirm a short combo, heavy attacks threaten a guard, and skills are separate cooldown actions. The prototype uses original style names, move names, and VFX rather than copying the reference game's assets or scripts. The server owns every hitbox, cooldown, breath cost, block, perfect-block, and block-break result; the client only predicts the feel and renders the result.
+## Architecture and design
 
-For a production game, the next layers would be matchmaking/rounds, persistent progression, animation assets, sound design, mobile controls, and anti-exploit telemetry. The combat foundation is already structured so those systems can be added without moving hit validation to the client.
+Read these in order:
 
-## Publish your own public GitHub repository
+1. [`RESEARCH_NOTES.md`](RESEARCH_NOTES.md) — public sources, dates, confidence, contradictions, and IP boundary.
+2. [`GAME_DESIGN_BIBLE.md`](GAME_DESIGN_BIBLE.md) — pillars, modes, movement, combat, kits, UI, and player experience.
+3. [`TECHNICAL_ARCHITECTURE.md`](TECHNICAL_ARCHITECTURE.md) — module boundaries, fixed step, renderer, and future authority model.
+4. [`MOVE_SPECIFICATIONS.md`](MOVE_SPECIFICATIONS.md) — frame-level universal and kit move data.
+5. [`IMPLEMENTATION_ROADMAP.md`](IMPLEMENTATION_ROADMAP.md) — milestones and acceptance criteria.
 
-The source folder is already a Git repository. If you want to publish it from your PC:
+The simulation is deliberately independent of Three.js so the future authoritative server can run the same state and move validation without a browser renderer. Multiplayer server authority, client prediction/reconciliation, skeletal production animation, authored audio, and a larger content roster are roadmap work.
 
-```powershell
-git status
-git add .
-git commit -m "Build PvP breathing combat prototype"
-git branch -M main
-git remote remove origin
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
-git push -u origin main
-```
+## Content boundary
 
-Before the final command, create an empty repository on GitHub and set its visibility to **Public**. Do not initialize it with another README or `.gitignore`, since those files are already included here. GitHub will prompt you to authenticate through your browser or credential manager.
+This is not a Roblox project and has no Roblox runtime dependency. The former repository files were a Roblox/Rojo prototype and are removed as part of this browser migration. Canon research is recorded for design study only; the implemented game uses original terms such as Riverform, Threadcraft, Lanternfall, and Moonlit Relay.

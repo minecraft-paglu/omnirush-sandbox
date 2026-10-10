@@ -1,0 +1,22 @@
+:root { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #e9eefb; background: #090e1c; font-synthesis: none; }
+* { box-sizing: border-box; }
+html, body, #game-shell { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+#game-canvas { display: block; width: 100%; height: 100%; }
+#hud { position: fixed; inset: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 22px 28px; text-shadow: 0 2px 8px #000; }
+.brand { letter-spacing: .28em; font-size: 11px; color: #9eaccb; }
+.brand strong { display: block; color: #ffe3a3; font-size: 20px; letter-spacing: .12em; margin-top: 2px; }
+.match-row { display: grid; grid-template-columns: 1fr 180px 1fr; align-items: start; gap: 24px; margin-top: 0; }
+.fighter-card { max-width: 360px; font-size: 12px; letter-spacing: .14em; }
+.fighter-card.red { justify-self: end; text-align: right; }
+.meter, .submeter { height: 8px; margin-top: 8px; border: 1px solid #566280; background: #121a2c; transform: skewX(-12deg); overflow: hidden; }
+.submeter { height: 4px; margin-top: 4px; border-color: #57677d; }
+.meter i, .submeter i { display: block; width: 100%; height: 100%; background: linear-gradient(90deg, #d8fbff, #52cfe8); transition: width .12s linear; }
+.red .meter i { background: linear-gradient(90deg, #ffbdac, #ed5872); }
+.submeter i { background: #ffe0a1; }
+.round { text-align: center; color: #94a3c5; font-size: 10px; letter-spacing: .12em; }
+.round b { display: block; color: #f4f1df; font-size: 18px; letter-spacing: .08em; }
+.round small { display: block; margin-top: 10px; font-size: 9px; letter-spacing: .03em; color: #73809e; }
+.bottom-panel { display: flex; justify-content: space-between; color: #aab7d2; font-size: 11px; letter-spacing: .02em; }
+.bottom-panel b { color: #ffe2a1; }
+#debug { position: fixed; left: 24px; bottom: 55px; padding: 12px; background: #070b15d9; border: 1px solid #526283; color: #d7e5ff; font: 11px/1.45 ui-monospace, monospace; pointer-events: none; }
+@media (max-width: 700px) { #hud { padding: 14px; } .match-row { grid-template-columns: 1fr 80px 1fr; gap: 8px; } .bottom-panel { font-size: 9px; flex-direction: column; gap: 4px; } .brand strong { font-size: 15px; } }

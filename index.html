@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b1020" />
+    <title>Breathbound: Lanternfall</title>
+  </head>
+  <body>
+    <main id="game-shell">
+      <canvas id="game-canvas" aria-label="Lanternfall arena"></canvas>
+      <section id="hud" aria-live="polite">
+        <header class="brand"><span>BREATHBOUND</span><strong>LANTERNFALL</strong></header>
+        <div class="match-row">
+          <div class="fighter-card blue"><b>RIVERFORM</b><div class="meter"><i id="p1-health"></i></div><div class="submeter"><i id="p1-focus"></i></div></div>
+          <div class="round">ROUND <b id="tick">0000</b><small id="event-feed">Training Yard · local simulation</small></div>
+          <div class="fighter-card red"><b>THREADCRAFT</b><div class="meter"><i id="p2-health"></i></div><div class="submeter"><i id="p2-focus"></i></div></div>
+        </div>
+        <div class="bottom-panel">
+          <div><b>J/K</b> light/heavy · <b>L</b> guard · <b>Space</b> jump · <b>Shift</b> dash · <b>E R T Y X</b> forms · <b>U</b> ultimate</div>
+          <div><b>F1</b> toggle debug · <b>F2</b> reset · P2: arrows + numpad</div>
+        </div>
+      </section>
+      <pre id="debug" hidden></pre>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
